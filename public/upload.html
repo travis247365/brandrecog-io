@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BrandCog.io — Upload images</title>
+<meta name="description" content="Manually load an OOH image batch into BrandCog.io for recognition." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --charcoal:#3A3A3A;--charcoal2:#2C2C2C;--cyan:#00BCD4;--cyan-d:#0097A7;--yellow:#FFC107;
+    --ink:#23262A;--slate:#6B7280;--line:#E6E8EB;--paper:#F5F7F8;--card:#FFFFFF;--pale:#E7F7FA;
+    --green:#2E7D32;--amber:#B45309;--red:#C62828;
+    --display:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --script:'Caveat',cursive;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;line-height:1.5}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px}
+  header.top{background:var(--charcoal);color:#fff;border-bottom:3px solid var(--cyan);position:relative}
+  header.top::before{content:"";position:absolute;left:0;top:0;width:54px;height:8px;background:var(--cyan)}
+  .topgrid{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0 18px;flex-wrap:wrap}
+  .brand{font-family:var(--display);font-size:26px;font-weight:800;letter-spacing:-.3px}
+  .brand .b{color:#fff}.brand .io{color:var(--cyan)}
+  .tagline{color:#b9bdc2;font-size:12.5px;margin-top:3px;font-weight:500}
+  .btn{display:inline-flex;align-items:center;gap:7px;background:var(--cyan);color:#06343b;border:0;border-radius:8px;
+    padding:11px 18px;font-size:13.5px;font-weight:700;cursor:pointer;transition:background .15s}
+  .btn:hover{background:var(--cyan-d);color:#fff}
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4);font-weight:600;padding:9px 14px}
+  .btn.ghost:hover{background:rgba(255,255,255,.1);color:#fff}
+
+  section{padding:26px 0}
+  .kicker{font-size:10.5px;letter-spacing:2.6px;text-transform:uppercase;color:var(--cyan-d);font-weight:700;margin:0 0 8px}
+  h1.sec{font-family:var(--display);font-size:24px;font-weight:700;color:var(--charcoal);margin:0 0 6px;border-bottom:3px solid var(--cyan);padding-bottom:8px;display:inline-block}
+  .lead{color:var(--slate);font-size:13.5px;max-width:680px}
+
+  .drop{margin-top:18px;background:var(--card);border:2px dashed var(--cyan);border-radius:14px;
+    padding:42px 24px;text-align:center;transition:background .15s,border-color .15s;cursor:pointer}
+  .drop.drag{background:var(--pale);border-color:var(--cyan-d)}
+  .drop .big{font-family:var(--display);font-size:18px;font-weight:700;color:var(--charcoal)}
+  .drop .small{color:var(--slate);font-size:12.5px;margin-top:6px}
+  .drop .icon{font-size:34px;color:var(--cyan)}
+
+  .files{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .fcard{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:11.5px}
+  .fcard .thumb{height:96px;background:#11181c center/cover no-repeat}
+  .fcard .fi{padding:8px 10px}
+  .fcard .fn{font-weight:600;color:var(--charcoal);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fcard .fs{color:var(--slate);margin-top:2px}
+
+  .actions{margin-top:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .count{font-size:13px;color:var(--slate)}.count b{color:var(--charcoal)}
+
+  .result{margin-top:18px;border-radius:12px;padding:16px 18px;font-size:13px;display:none}
+  .result.ok{display:block;background:#eaf6f8;border:1px solid var(--cyan)}
+  .result.bad{display:block;background:#f9eaea;border:1px solid var(--red);color:var(--red)}
+  .result h3{margin:0 0 6px;font-family:var(--display);font-size:15px;color:var(--charcoal)}
+  .note{background:#fff7e0;border:1px solid var(--yellow);border-radius:10px;padding:12px 14px;margin-top:18px;font-size:12.5px;color:#5b4a13}
+
+  footer{border-top:1px solid var(--line);margin-top:14px;padding:22px 0 44px;color:var(--slate);font-size:11.5px}
+  .sig{font-family:var(--script);font-size:24px;color:var(--charcoal);line-height:1}
+  .sigsub{font-size:11px;color:var(--slate);letter-spacing:.5px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap topgrid">
+    <div>
+      <div class="brand"><span class="b">BrandCog</span><span class="io">.io</span></div>
+      <div class="tagline">Manual image ingestion</div>
+    </div>
+    <a class="btn ghost" href="/app">&#8592; Back to dashboard</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <section>
+    <p class="kicker">Ingestion · sub-50 batch</p>
+    <h1 class="sec">Load your OOH images</h1>
+    <p class="lead">Drag a batch of billboard photos here, or browse. Geo-tagged JPEGs are ideal — EXIF GPS becomes the site map. Up to 50 images, 15&nbsp;MB each.</p>
+
+    <input id="picker" type="file" accept="image/*" multiple hidden />
+    <div class="drop" id="drop">
+      <div class="icon">&#8682;</div>
+      <div class="big">Drop images here</div>
+      <div class="small">or click to browse · JPEG / PNG / HEIC · max 50 files</div>
+    </div>
+
+    <div id="files" class="files"></div>
+
+    <div class="actions">
+      <button class="btn" id="send" disabled>Send batch to BrandCog</button>
+      <button class="btn ghost" id="clear" style="color:var(--charcoal);border-color:var(--line)" hidden>Clear</button>
+      <span class="count" id="count"></span>
+    </div>
+
+    <div class="result" id="result"></div>
+
+    <div class="note">
+      <b>How this works.</b> Files are accepted into BrandCog's ingestion queue (held in memory for this demo, not persisted).
+      Brand recognition itself runs in the offline CLIP pipeline — this page proves the upload path end-to-end. Currently queued on the server: <b id="queued">…</b>.
+      No real personal data should be uploaded; treat this as a sandbox.
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="sig">Travis Paul</div>
+    <div class="sigsub">BRANDCOG.IO · A TRAVIS PAUL CONSULTING BUILD</div>
+  </div>
+</footer>
+
+<script>
+const picker=document.getElementById("picker"), drop=document.getElementById("drop"),
+      filesEl=document.getElementById("files"), sendBtn=document.getElementById("send"),
+      clearBtn=document.getElementById("clear"), countEl=document.getElementById("count"),
+      resultEl=document.getElementById("result");
+let chosen=[];
+const fmt=b=>b>=1048576?(b/1048576).toFixed(1)+" MB":(b/1024).toFixed(0)+" KB";
+
+function refresh(){
+  filesEl.innerHTML=chosen.map((f,i)=>{
+    const url=URL.createObjectURL(f);
+    return `<div class="fcard"><div class="thumb" style="background-image:url('${url}')"></div>`+
+      `<div class="fi"><div class="fn" title="${f.name}">${f.name}</div><div class="fs">${fmt(f.size)}</div></div></div>`;
+  }).join("");
+  const tot=chosen.reduce((s,f)=>s+f.size,0);
+  countEl.textContent=chosen.length?`${chosen.length} file(s) · ${fmt(tot)}`:"";
+  sendBtn.disabled=!chosen.length;
+  clearBtn.hidden=!chosen.length;
+}
+function add(list){
+  for(const f of list){ if(f.type.startsWith("image/") && chosen.length<50) chosen.push(f); }
+  refresh();
+}
+drop.addEventListener("click",()=>picker.click());
+picker.addEventListener("change",e=>add(e.target.files));
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("drag")}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("drag")}));
+drop.addEventListener("drop",e=>add(e.dataTransfer.files));
+clearBtn.addEventListener("click",()=>{chosen=[];refresh();resultEl.className="result"});
+
+sendBtn.addEventListener("click",async()=>{
+  if(!chosen.length) return;
+  sendBtn.disabled=true; sendBtn.textContent="Uploading…";
+  const fd=new FormData();
+  chosen.forEach(f=>fd.append("images",f,f.name));
+  try{
+    const res=await fetch("/api/ingest",{method:"POST",body:fd});
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.detail||("HTTP "+res.status));
+    resultEl.className="result ok";
+    resultEl.innerHTML=`<h3>✓ Batch received — ${data.accepted} image(s)</h3>`+
+      `<div>${fmt(data.totalBytes)} ingested · ${data.queued} now queued on the server.</div>`+
+      `<div style="margin-top:8px;color:var(--slate)">${data.note}</div>`;
+    chosen=[]; refresh(); loadStatus();
+  }catch(err){
+    resultEl.className="result bad";
+    resultEl.innerHTML=`<h3>Upload failed</h3><div>${err.message}</div>`;
+  }finally{
+    sendBtn.textContent="Send batch to BrandCog";
+  }
+});
+
+async function loadStatus(){
+  try{ const s=await (await fetch("/api/ingest/status")).json();
+    document.getElementById("queued").textContent=s.queued; }
+  catch{ document.getElementById("queued").textContent="—"; }
+}
+loadStatus();
+</script>
+</body>
+</html>

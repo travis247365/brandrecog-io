@@ -1,0 +1,27 @@
+{
+  "name": "brandcog-mvp",
+  "version": "1.2.07",
+  "private": true,
+  "description": "BrandCog.Base-ai — OOH brand-recognition intelligence MVP (mock-first, deployable demo).",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "MOCK=1 tsx watch server/index.ts",
+    "build": "esbuild server/index.ts --bundle --platform=node --format=cjs --target=node20 --outfile=dist/index.js",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.14.0",
+    "esbuild": "^0.21.5",
+    "puppeteer-core": "^25.1.0",
+    "tsx": "^4.15.0",
+    "typescript": "^5.4.5"
+  }
+}

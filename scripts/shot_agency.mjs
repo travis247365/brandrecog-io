@@ -1,0 +1,11 @@
+import puppeteer from "puppeteer-core";
+const OUT = "/Users/tpmulenga/Desktop/BrandCog.ai (BrandRecog.io)/mvp";
+const b = await puppeteer.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: "new", args: ["--no-sandbox"] });
+const p = await b.newPage();
+await p.setViewport({ width: 1340, height: 1600, deviceScaleFactor: 1 });
+await p.setCookie({ name: "bc_client", value: "agency", domain: "localhost", path: "/", httpOnly: true });
+await p.goto("http://localhost:3009/", { waitUntil: "networkidle0" });
+await new Promise((r) => setTimeout(r, 900));
+await p.screenshot({ path: `${OUT}/qa_agency_full.png`, fullPage: true });
+await b.close();
+console.log("ok");

@@ -1,0 +1,9 @@
+node_modules
+dist
+data
+qa_*.png
+.git
+.env
+*.log
+npm-debug.log*
+.DS_Store

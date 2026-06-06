@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BrandRecog.io — Client login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{--charcoal:#3A3A3A;--charcoal2:#2C2C2C;--cyan:#00BCD4;--cyan-d:#0097A7;--yellow:#FFC107;
+    --ink:#23262A;--slate:#6B7280;--line:#E6E8EB;--card:#fff;--red:#C62828;--display:'Montserrat',sans-serif;--body:'Inter',sans-serif;}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;font-family:var(--body);color:#fff;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:radial-gradient(900px 480px at 80% -10%,#16384a 0%,transparent 60%),linear-gradient(160deg,var(--charcoal2),#1b1b1b)}
+  .card{width:100%;max-width:430px;background:var(--card);color:var(--ink);border-radius:16px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+  .top{background:var(--charcoal);color:#fff;padding:26px 28px 22px;position:relative;border-bottom:3px solid var(--cyan)}
+  .top::before{content:"";position:absolute;left:0;top:0;width:52px;height:7px;background:var(--cyan)}
+  .logo{font-family:var(--display);font-weight:800;font-size:25px}.logo .io{color:var(--cyan)}
+  .sub{color:#b9bdc2;font-size:12.5px;margin-top:4px}
+  .body{padding:24px 28px 26px}
+  label{display:block;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--slate);font-weight:700;margin:14px 0 6px}
+  input{width:100%;padding:12px;border:1px solid var(--line);border-radius:9px;font-family:var(--body);font-size:14px;color:var(--ink)}
+  input:focus{outline:2px solid var(--cyan);border-color:var(--cyan)}
+  .btn{width:100%;margin-top:20px;background:var(--cyan);color:#06343b;border:0;border-radius:10px;padding:13px;font-family:var(--display);font-weight:800;font-size:14.5px;cursor:pointer}
+  .btn:hover{background:var(--cyan-d);color:#fff}
+  .hint{margin-top:14px;font-size:12px;color:var(--slate);background:#fff7e0;border:1px solid var(--yellow);border-radius:9px;padding:10px 12px}
+  .hint b{color:#5b4a13}
+  .err{margin-top:12px;font-size:13px;color:var(--red);background:#f9eaea;border:1px solid var(--red);border-radius:9px;padding:10px 12px;display:none}.err.show{display:block}
+  .foot{padding:0 28px 22px;color:#8a8f95;font-size:11px}.foot a{color:var(--cyan-d);font-weight:600}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="top">
+      <div class="logo">BrandRecog<span class="io">.io</span></div>
+      <div class="sub">Client portal · part of the BrandCog.ai platform</div>
+    </div>
+    <div class="body">
+      <label for="u">Username</label>
+      <input id="u" list="users" placeholder="e.g. agency, mtn, fnb" autocomplete="username" />
+      <datalist id="users"></datalist>
+      <label for="p">Password</label>
+      <input id="p" type="password" placeholder="Password" autocomplete="current-password" />
+      <button class="btn" id="enter">Sign in</button>
+      <div class="err" id="err"></div>
+      <div class="hint">Demo credentials: username is the brand key (e.g. <b>agency</b>, <b>mtn</b>, <b>fnb</b>, <b>bolabet</b>, <b>bpsa</b>), password is <b>&lt;username&gt;2026</b> (e.g. <b>agency2026</b>). No account? <a href="/signup">Get demo access</a>.</div>
+    </div>
+    <div class="foot"><a href="/marketing">Learn more</a> · <a href="/">Home</a> · A Travis Paul Holdings company</div>
+  </div>
+<script>
+const u=document.getElementById("u"), p=document.getElementById("p"), enter=document.getElementById("enter"), err=document.getElementById("err");
+fetch("/api/clients").then(r=>r.json()).then(list=>{
+  document.getElementById("users").innerHTML=list.map(c=>`<option value="${c.username}">${c.name}</option>`).join("");
+}).catch(()=>{});
+async function login(){
+  err.classList.remove("show"); enter.textContent="Signing in…"; enter.disabled=true;
+  try{
+    const res=await fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u.value,password:p.value})});
+    if(!res.ok){ const d=await res.json(); throw new Error(d.detail||"Login failed"); }
+    location.href="/app";
+  }catch(e){ err.textContent=e.message; err.classList.add("show"); }
+  finally{ enter.textContent="Sign in"; enter.disabled=false; }
+}
+enter.onclick=login;
+p.addEventListener("keydown",e=>{if(e.key==="Enter")login();});
+</script>
+</body>
+</html>
