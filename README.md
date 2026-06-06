@@ -1,17 +1,20 @@
-# BrandRecog.io — MVP (mvp1.2.07)
+# BrandRecog.io — v2.0.0
 
 Photo-verified out-of-home (OOH) brand intelligence. The first channel of the
 **BrandCog.ai** 360° Brand Health platform. Company: **Equanamity** (a Travis Paul
 Holdings company). Typed Node/Express, **mock-first**, deploy pattern per `CLAUDE.md`.
 
-Versioning: single source `shared/version.ts` (+0.0.1 per change) · history in `CHANGELOG.md`.
+**One app:** the canonical deployment is **https://brandcog-io.fly.dev**. (The earlier
+`brandcog-demo` app — v0.2.0, "BrandCog.Base-ai" — is retired behind a 301 redirect here.)
+
+Versioning: single source `shared/version.ts` · history in `CHANGELOG.md`.
 
 ## Integrated site
 - `/` Coming-Soon + waitlist · `/marketing` (learn more, pricing, book-a-demo) ·
   `/signup` (email-gated) · `/login` (username/password) · `/app` (dashboard) · `/upload`.
 - **Email gating:** business/work email → **real data**; free email → **mock** (synthetic Lusaka). `server/domain/emailGate.ts`.
-- **Auth (mock):** username = client key, password = `<key>2026` (e.g. `agency`/`agency2026`). `server/clients.ts`.
-- **Leads DB:** waitlist/signup/booking persist to a Fly volume (`/data`); admin CSV at `/api/leads?key=$ADMIN_KEY&format=csv`.
+- **Auth (intentional public demo):** username = client key, password = `<key>2026` (e.g. `agency`/`agency2026`) — the login page documents this; demo data only, no PII. `server/clients.ts`.
+- **Leads DB:** waitlist/signup/booking persist to a Fly volume (`/data`); admin CSV at `/api/leads?key=$ADMIN_KEY&format=csv`. **`ADMIN_KEY` must be set as a Fly secret in production** (gates prospect PII; the source default is local-dev only).
 
 ## Maps — free now, Google ready for paying clients
 - **Default: OpenStreetMap (Leaflet)** — free, no key, no billing. Active out of the box.
@@ -35,7 +38,8 @@ PORT=4000 node dist/index.js     # http://localhost:4000   (add GOOGLE_MAPS_API_
 
 ## Deploy (Fly.io) — on sign-off
 ```bash
-fly deploy --remote-only --ha=false      # apps: brandcog-io (canonical) + brandcog-demo (bookmark sync)
+fly secrets set ADMIN_KEY=<strong-unique-value> -a brandcog-io   # required (prod PII gate)
+fly deploy --remote-only --ha=false -a brandcog-io               # one canonical app
 ```
 Free OSM map by default — do **not** set the Google secret unless a paying client opts in.
 

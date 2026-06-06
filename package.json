@@ -1,8 +1,8 @@
 {
-  "name": "brandcog-mvp",
-  "version": "1.2.07",
+  "name": "brandrecog-io",
+  "version": "2.0.0",
   "private": true,
-  "description": "BrandCog.Base-ai — OOH brand-recognition intelligence MVP (mock-first, deployable demo).",
+  "description": "BrandRecog.io — photo-verified out-of-home (OOH) brand intelligence (mock-first, deployable). A BrandCog.ai platform by Equanamity.",
   "type": "commonjs",
   "scripts": {
     "dev": "MOCK=1 tsx watch server/index.ts",

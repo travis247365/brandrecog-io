@@ -3,6 +3,12 @@
 Versioning: semver-style `MAJOR.MINOR.PATCH`, bumped +0.0.1 per shipped change.
 Single source: `shared/version.ts` (surfaced via `/healthz`, `/api/config`, and the UI footer).
 
+## 2.0.0 — One app, public-ready
+- **Single-app consolidation:** `brandcog-io` is now the one canonical app. The old `brandcog-demo` (v0.2.0, "BrandCog.Base-ai") is retired behind a 301 redirect to `brandcog-io`; its deployed build is archived privately.
+- **Security hardening for public source:** `ADMIN_KEY` (gates the leads/PII export) is now a required Fly secret — the source default is local-dev only and no longer works in production. `.env.example` documents production secrets. Client login remains an intentional public demo (scheme shown on the login page; demo data only, no PII).
+- **Public release:** the v1.2.x codebase is published as a public repo at this version; v0.2.0 retained in a separate private archive.
+- Functionally identical to 1.2.07 (no engine/feature changes) — this is the milestone/version-line bump.
+
 ## 1.2.07 — Real geo + site snapshots
 - Real-data accounts get geo-located sites (EXIF GPS re-extracted from billboard images) and **site OOH snapshots** (bundled creative thumbnails).
 - Map renders real ZM/SA pins for verified accounts; mock accounts keep synthetic Lusaka geo.

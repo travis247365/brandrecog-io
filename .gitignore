@@ -5,3 +5,7 @@ qa_*.png
 *.log
 .DS_Store
 .env
+# session transcripts / worksession dumps (never publish)
+*Worksession*
+*Deployment Session*
+*Deployment to Fly*
