@@ -224,17 +224,31 @@ function loadGoogle(key){
     const s=document.createElement("script"); s.src="https://maps.googleapis.com/maps/api/js?key="+encodeURIComponent(key); s.onload=()=>res(); s.onerror=()=>res(); document.head.appendChild(s);
   });
 }
+let _geo=[];
+async function fallbackOSM(msg){
+  const el=document.getElementById("bcmap"), note=document.getElementById("mapnote");
+  if(!el||!_geo.length) return;
+  if(msg&&note) note.innerHTML=msg;
+  await loadLeaflet(); if(window.L) renderLeaflet(el,_geo);
+}
+// Google fires this on any auth/billing/referrer failure -> drop to free OSM.
+window.gm_authFailure=function(){ fallbackOSM(_geo.length+' geo-located OOH sites · OpenStreetMap (Google Maps needs billing/referrer set)'); };
 async function initMap(sc){
   const note=document.getElementById("mapnote"), el=document.getElementById("bcmap");
   if(!el) return;
   if(!mapCfg){ try{ mapCfg=await (await fetch("/api/config")).json(); }catch{ mapCfg={maps:"osm"}; } }
   let sites=[]; try{ sites=await (await fetch("/api/sites?market="+encodeURIComponent(sc))).json(); }catch{}
   const geo=(sites||[]).filter(s=>typeof s.lat==="number"&&typeof s.lon==="number");
+  _geo=geo;
   if(!geo.length){ note.innerHTML='No geo-located sites in this view yet. Geo is available on <b>live-data</b> accounts (EXIF GPS from billboard photos).'; el.style.display="none"; return; }
   note.innerHTML=geo.length+' geo-located OOH sites · '+(mapCfg.maps==="google"?"Google Maps":"OpenStreetMap (free)");
   el.style.display="block";
-  if(mapCfg.maps==="google"&&mapCfg.googleKey){ await loadGoogle(mapCfg.googleKey); if(window.google&&google.maps){ renderGoogle(el,geo); return; } }
-  await loadLeaflet(); if(window.L) renderLeaflet(el,geo);
+  if(mapCfg.maps==="google"&&mapCfg.googleKey){
+    await loadGoogle(mapCfg.googleKey);
+    if(window.google&&google.maps){ try{ renderGoogle(el,geo); return; }catch{ await fallbackOSM(); return; } }
+  }
+  await loadLeaflet();
+  if(window.L) renderLeaflet(el,geo);
   else note.textContent="Map library unavailable offline; site list: "+geo.map(s=>s.site).join(" · ");
 }
 function popupHTML(s){
