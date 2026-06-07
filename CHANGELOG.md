@@ -3,6 +3,12 @@
 Versioning: semver-style `MAJOR.MINOR.PATCH`, bumped +0.0.1 per shipped change.
 Single source: `shared/version.ts` (surfaced via `/healthz`, `/api/config`, and the UI footer).
 
+## 2.2.0 — Waitlist confirmation email
+- **Customer-facing confirmation** sent to the lead on waitlist signup ("You're on the BrandRecog.io waitlist") — branded HTML, CTAs to the live demo + marketing page (`server/domain/waitlistConfirm.ts`).
+- Email port now supports per-message `from`/`to` overrides (`server/ports/email.ts`), so the confirmation sends from a customer sender to the lead, independent of the internal alert.
+- Sender configurable via `RESEND_CONFIRM_FROM_EMAIL` (supports `"Name <addr>"`). Intended `hello@brandrecog.io` once that domain is registered+verified; until then set to a verified address (e.g. `BrandRecog.io <hello@travispaulconsulting.co>`). `PUBLIC_SITE_URL` sets the links.
+- Both fire-and-forget — never block or break waitlist capture.
+
 ## 2.1.0 — R2BL lead-alert email
 - **Email alert on every new lead** (waitlist / signup / booking) to the sales inbox (`RESEND_TO_EMAIL`, default `travis.mulenga@gmail.com`).
 - **R2BL prospect profile** per lead — Reputation · Risk · Bio · Lifestyle, deterministic weighted scoring (`server/domain/r2bl.ts`, mirrors the R2BL engine), banded (not false-precision), with factor **provenance** (measured/modelled/assumed) + **discrimination-risk** flags, a narrative, a recommended next action, and a Prospect Priority band (Hot/Warm/Nurture/Cold). Built on the Verithica app-case methodology.

@@ -15,6 +15,7 @@ import { getClient, authenticate, listClients } from "./clients";
 import { tierFor, datasetForTier, isValidEmail, domainOf, isFreeDomain } from "./domain/emailGate";
 import { addLead, listLeads, leadStats, leadsCsv } from "./ports/leadStore";
 import { notifyNewLead } from "./domain/leadAlert";
+import { sendWaitlistConfirmation } from "./domain/waitlistConfirm";
 import { VERSION } from "../shared/version";
 import type { CampaignReport } from "../shared/types";
 
@@ -156,7 +157,9 @@ app.post("/api/waitlist", (req: Request, res: Response) => {
   const b = (req.body ?? {}) as Record<string, string>;
   const email = String(b.email ?? "").trim();
   if (!isValidEmail(email)) return res.status(400).json({ error: "bad_email", detail: "Enter a valid email." });
-  notifyNewLead(addLead({ kind: "waitlist", name: b.name ?? "", email, domain: domainOf(email), tier: tierFor(email), company: b.company }));
+  const waitLead = addLead({ kind: "waitlist", name: b.name ?? "", email, domain: domainOf(email), tier: tierFor(email), company: b.company });
+  notifyNewLead(waitLead);                 // internal R2BL alert to sales
+  sendWaitlistConfirmation(waitLead);      // customer-facing confirmation to the lead
   res.json({ ok: true, note: "You're on the waitlist — we'll be in touch before launch." });
 });
 

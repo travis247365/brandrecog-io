@@ -10,6 +10,8 @@ export interface EmailMessage {
   subject: string;
   html: string;
   text: string;
+  from?: string;   // override sender (e.g. customer-facing confirmation); else RESEND_FROM_EMAIL
+  to?: string;     // override recipient (e.g. the lead); else RESEND_TO_EMAIL
 }
 
 export interface EmailResult {
@@ -23,13 +25,13 @@ export interface EmailPort {
   send(msg: EmailMessage): Promise<EmailResult>;
 }
 
-const FROM = process.env.RESEND_FROM_EMAIL ?? "ask@equanamity.co";
+const FROM = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
 const TO = process.env.RESEND_TO_EMAIL ?? "travis.mulenga@gmail.com";
 
 // ── Mock (no key): logs, never sends ─────────────────────────────────────────
 class MockEmail implements EmailPort {
   async send(msg: EmailMessage): Promise<EmailResult> {
-    console.log(`[MockEmail] would send to ${TO}: "${msg.subject}" (set RESEND_API_KEY to send)`);
+    console.log(`[MockEmail] would send from ${msg.from ?? FROM} to ${msg.to ?? TO}: "${msg.subject}" (set RESEND_API_KEY to send)`);
     return { success: true, mocked: true, messageId: `mock-${Date.now()}` };
   }
 }
@@ -42,7 +44,7 @@ class ResendEmail implements EmailPort {
       const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: { Authorization: `Bearer ${this.apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ from: FROM, to: [TO], subject: msg.subject, html: msg.html, text: msg.text }),
+        body: JSON.stringify({ from: msg.from ?? FROM, to: [msg.to ?? TO], subject: msg.subject, html: msg.html, text: msg.text }),
       });
       const data = (await res.json().catch(() => ({}))) as { id?: string; message?: string };
       if (!res.ok) return { success: false, error: data.message ?? `HTTP ${res.status}` };

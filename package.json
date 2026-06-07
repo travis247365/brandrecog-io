@@ -1,6 +1,6 @@
 {
   "name": "brandrecog-io",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "description": "BrandRecog.io — photo-verified out-of-home (OOH) brand intelligence (mock-first, deployable). A BrandCog.ai platform by Equanamity.",
   "type": "commonjs",
