@@ -3,6 +3,9 @@
 Versioning: semver-style `MAJOR.MINOR.PATCH`, bumped +0.0.1 per shipped change.
 Single source: `shared/version.ts` (surfaced via `/healthz`, `/api/config`, and the UI footer).
 
+## 2.2.2 — Admin lead delete (cleanup)
+- `DELETE /api/leads/:id` (admin: agency session or `ADMIN_KEY`) to remove a lead by id — `deleteLead()` in the lead store. Used to purge test records from the live store. Smoke covers protected/200/404 paths.
+
 ## 2.2.1 — Original marketing tagline (IP risk fix)
 - Reworded the `/marketing` hero + page title away from "Are you getting the out-of-home exposure you paid for?" — a near-verbatim match to a competitor (Media Measure) tagline, an avoidable passing-off/copyright risk.
 - New original hero (TP Mulenga): **"Measurable outcomes for your media."** + sub **"We deliver beyond proof of flighting"** — positions above basic flighting-verification (what competitors sell) into measured outcomes. Title now "Measurable outcomes for your media".

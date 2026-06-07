@@ -13,7 +13,7 @@ import { overview, competitive, brandList, sitePoints, snapshots } from "./domai
 import { agencyAnalysis } from "./domain/agencyAnalysis";
 import { getClient, authenticate, listClients } from "./clients";
 import { tierFor, datasetForTier, isValidEmail, domainOf, isFreeDomain } from "./domain/emailGate";
-import { addLead, listLeads, leadStats, leadsCsv } from "./ports/leadStore";
+import { addLead, listLeads, leadStats, leadsCsv, deleteLead } from "./ports/leadStore";
 import { notifyNewLead } from "./domain/leadAlert";
 import { sendWaitlistConfirmation } from "./domain/waitlistConfirm";
 import { VERSION } from "../shared/version";
@@ -181,6 +181,15 @@ app.get("/api/leads", (req: Request, res: Response) => {
     return res.send(leadsCsv());
   }
   res.json({ stats: leadStats(), leads: listLeads() });
+});
+
+// admin lead delete (cleanup). agency session OR admin key. Delete one lead by id.
+app.delete("/api/leads/:id", (req: Request, res: Response) => {
+  const ok = currentClient(req)?.role === "agency" || req.headers["x-admin-key"] === ADMIN_KEY || req.query.key === ADMIN_KEY;
+  if (!ok) return res.status(403).json({ error: "forbidden" });
+  const removed = deleteLead(String(req.params.id));
+  if (!removed) return res.status(404).json({ error: "not_found", detail: "No lead with that id." });
+  res.json({ ok: true, deleted: req.params.id, stats: leadStats() });
 });
 
 // ---- competitive analytics (tier-aware dataset) -----------------------------

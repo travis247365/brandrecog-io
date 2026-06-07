@@ -55,6 +55,15 @@ export function listLeads(): Lead[] {
   return load().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
+/** Remove a lead by id. Returns true if a row was deleted. */
+export function deleteLead(id: string): boolean {
+  const rows = load();
+  const next = rows.filter((r) => r.id !== id);
+  if (next.length === rows.length) return false;
+  save(next);
+  return true;
+}
+
 export function leadStats() {
   const rows = load();
   return {

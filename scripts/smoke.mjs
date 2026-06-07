@@ -15,11 +15,11 @@ try {
   if (!healthy) throw new Error("server did not become healthy");
 
   const h = await j(await fetch(`${base}/healthz`));
-  assert(h.version === "2.2.1", `version ${h.version}`);
+  assert(h.version === "2.2.2", `version ${h.version}`);
   assert(h.realRecords > 500 && h.mockRecords > 0, `datasets loaded (real ${h.realRecords}, mock ${h.mockRecords})`);
   // map + config + real geo
   const cfg = await j(await fetch(`${base}/api/config`));
-  assert(cfg.version === "2.2.1" && (cfg.maps === "osm" || cfg.maps === "google"), `config (maps=${cfg.maps})`);
+  assert(cfg.version === "2.2.2" && (cfg.maps === "osm" || cfg.maps === "google"), `config (maps=${cfg.maps})`);
   const realSites = await j(await fetch(`${base}/api/sites?market=All`, { headers: { cookie: "bc_data=real" } }));
   assert(realSites.length > 50 && realSites.some((s) => s.snapshot), `real geo sites + snapshots (${realSites.length})`);
   assert(h.leads && typeof h.leads.total === "number", "lead store wired");
@@ -68,6 +68,17 @@ try {
   assert(denied.status === 403, "leads export protected");
   const leads = await j(await fetch(`${base}/api/leads`, { headers: { cookie: ac } }));
   assert(leads.leads.length >= 3, `leads persisted & exportable (${leads.leads.length})`);
+
+  // admin delete (cleanup)
+  const delDenied = await fetch(`${base}/api/leads/${leads.leads[0].id}`, { method: "DELETE" });
+  assert(delDenied.status === 403, "lead delete protected");
+  const before = leads.leads.length;
+  const delOk = await fetch(`${base}/api/leads/${leads.leads[0].id}`, { method: "DELETE", headers: { cookie: ac } });
+  assert(delOk.ok, "lead delete (admin)");
+  const after = await j(await fetch(`${base}/api/leads`, { headers: { cookie: ac } }));
+  assert(after.leads.length === before - 1, `lead removed (${before} → ${after.leads.length})`);
+  const delMiss = await fetch(`${base}/api/leads/nope123`, { method: "DELETE", headers: { cookie: ac } });
+  assert(delMiss.status === 404, "delete unknown id → 404");
 
   console.log("\nSMOKE PASS");
 } catch (e) {
