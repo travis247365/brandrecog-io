@@ -14,6 +14,7 @@ import { agencyAnalysis } from "./domain/agencyAnalysis";
 import { getClient, authenticate, listClients } from "./clients";
 import { tierFor, datasetForTier, isValidEmail, domainOf, isFreeDomain } from "./domain/emailGate";
 import { addLead, listLeads, leadStats, leadsCsv } from "./ports/leadStore";
+import { notifyNewLead } from "./domain/leadAlert";
 import { VERSION } from "../shared/version";
 import type { CampaignReport } from "../shared/types";
 
@@ -140,7 +141,7 @@ app.post("/api/signup", (req: Request, res: Response) => {
   if (!b.name || !isValidEmail(email)) return res.status(400).json({ error: "bad_input", detail: "Name and a valid email are required." });
   const tier = tierFor(email);
   const dataset = datasetForTier(tier);
-  addLead({ kind: "signup", name: b.name, email, domain: domainOf(email), tier, company: b.company, role: b.role, market: b.market, type: b.type, useCase: b.useCase });
+  notifyNewLead(addLead({ kind: "signup", name: b.name, email, domain: domainOf(email), tier, company: b.company, role: b.role, market: b.market, type: b.type, useCase: b.useCase }));
   setCookie(res, C_ID, "demo");
   setCookie(res, C_DATA, dataset);
   res.json({
@@ -155,7 +156,7 @@ app.post("/api/waitlist", (req: Request, res: Response) => {
   const b = (req.body ?? {}) as Record<string, string>;
   const email = String(b.email ?? "").trim();
   if (!isValidEmail(email)) return res.status(400).json({ error: "bad_email", detail: "Enter a valid email." });
-  addLead({ kind: "waitlist", name: b.name ?? "", email, domain: domainOf(email), tier: tierFor(email), company: b.company });
+  notifyNewLead(addLead({ kind: "waitlist", name: b.name ?? "", email, domain: domainOf(email), tier: tierFor(email), company: b.company }));
   res.json({ ok: true, note: "You're on the waitlist — we'll be in touch before launch." });
 });
 
@@ -163,7 +164,7 @@ app.post("/api/book", (req: Request, res: Response) => {
   const b = (req.body ?? {}) as Record<string, string>;
   const email = String(b.email ?? "").trim();
   if (!b.name || !isValidEmail(email)) return res.status(400).json({ error: "bad_input", detail: "Name and a valid email are required." });
-  addLead({ kind: "booking", name: b.name, email, domain: domainOf(email), tier: tierFor(email), company: b.company, role: b.role, market: b.market, type: b.type, useCase: b.useCase });
+  notifyNewLead(addLead({ kind: "booking", name: b.name, email, domain: domainOf(email), tier: tierFor(email), company: b.company, role: b.role, market: b.market, type: b.type, useCase: b.useCase }));
   res.json({ ok: true, note: "Request received — we'll reach out to schedule your walkthrough." });
 });
 
