@@ -15,11 +15,11 @@ try {
   if (!healthy) throw new Error("server did not become healthy");
 
   const h = await j(await fetch(`${base}/healthz`));
-  assert(h.version === "2.2.0", `version ${h.version}`);
+  assert(h.version === "2.2.1", `version ${h.version}`);
   assert(h.realRecords > 500 && h.mockRecords > 0, `datasets loaded (real ${h.realRecords}, mock ${h.mockRecords})`);
   // map + config + real geo
   const cfg = await j(await fetch(`${base}/api/config`));
-  assert(cfg.version === "2.2.0" && (cfg.maps === "osm" || cfg.maps === "google"), `config (maps=${cfg.maps})`);
+  assert(cfg.version === "2.2.1" && (cfg.maps === "osm" || cfg.maps === "google"), `config (maps=${cfg.maps})`);
   const realSites = await j(await fetch(`${base}/api/sites?market=All`, { headers: { cookie: "bc_data=real" } }));
   assert(realSites.length > 50 && realSites.some((s) => s.snapshot), `real geo sites + snapshots (${realSites.length})`);
   assert(h.leads && typeof h.leads.total === "number", "lead store wired");

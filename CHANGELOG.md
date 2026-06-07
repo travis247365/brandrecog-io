@@ -3,6 +3,11 @@
 Versioning: semver-style `MAJOR.MINOR.PATCH`, bumped +0.0.1 per shipped change.
 Single source: `shared/version.ts` (surfaced via `/healthz`, `/api/config`, and the UI footer).
 
+## 2.2.1 — Original marketing tagline (IP risk fix)
+- Reworded the `/marketing` hero + page title away from "Are you getting the out-of-home exposure you paid for?" — a near-verbatim match to a competitor (Media Measure) tagline, an avoidable passing-off/copyright risk.
+- New original hero (TP Mulenga): **"Measurable outcomes for your media."** + sub **"We deliver beyond proof of flighting"** — positions above basic flighting-verification (what competitors sell) into measured outcomes. Title now "Measurable outcomes for your media".
+- Minor body edits to remove residual "paid for" phrasing (generic, non-infringing, hardened anyway).
+
 ## 2.2.0 — Waitlist confirmation email
 - **Customer-facing confirmation** sent to the lead on waitlist signup ("You're on the BrandRecog.io waitlist") — branded HTML, CTAs to the live demo + marketing page (`server/domain/waitlistConfirm.ts`).
 - Email port now supports per-message `from`/`to` overrides (`server/ports/email.ts`), so the confirmation sends from a customer sender to the lead, independent of the internal alert.
